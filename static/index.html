@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pause: check before you tap</title>
+<meta name="description" content="Paste a suspicious message and find out if it's a scam before you tap anything.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23070B14'/%3E%3Crect x='9' y='8' width='5' height='16' fill='%235EEAFF'/%3E%3Crect x='18' y='8' width='5' height='16' fill='%235EEAFF'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#070B14; --panel:#0D1424; --line:#1F2A42; --ink:#F2F6FF; --mute:#8D9BB8;
+  --accent:#5EEAFF; --red:#FF4D4D; --amber:#FFB020; --green:#3DDC97;
+  --display:"Archivo",system-ui,sans-serif; --mono:"JetBrains Mono",ui-monospace,monospace;
+}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.6 var(--mono);-webkit-font-smoothing:antialiased}
+.wrap{max-width:760px;margin:0 auto;padding:28px 20px 72px}
+
+/* brand */
+.brand{display:flex;align-items:center;gap:12px;margin-bottom:clamp(40px,9vw,88px)}
+.mark{width:34px;height:34px;background:var(--accent);display:grid;place-items:center}
+.mark svg{width:18px;height:18px;fill:var(--bg)}
+.brand b{font:800 22px var(--display);font-stretch:110%;letter-spacing:-.01em}
+.brand span{margin-left:auto;color:var(--mute);font-size:13px}
+
+/* hero */
+h1{font:900 clamp(52px,13vw,120px)/.9 var(--display);font-stretch:125%;letter-spacing:-.045em;margin-bottom:20px}
+h1 i{font-style:normal;color:var(--accent)}
+.lead{color:var(--mute);max-width:46ch;margin-bottom:36px}
+
+/* input */
+.box{border:1px solid var(--line);background:var(--panel)}
+.box:focus-within{border-color:var(--accent)}
+textarea{display:block;width:100%;min-height:160px;padding:18px;background:transparent;border:0;color:var(--ink);font:inherit;font-size:15px;resize:vertical}
+textarea:focus{outline:none}
+textarea::placeholder{color:#5A6784}
+.bar{display:flex;align-items:center;gap:12px;padding:10px 12px;border-top:1px solid var(--line);flex-wrap:wrap}
+.count{color:var(--mute);font-size:13px;margin-right:auto}
+button{font:700 14px var(--mono);cursor:pointer;border-radius:0}
+button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.ghost{background:transparent;color:var(--mute);border:1px solid var(--line);padding:10px 14px}
+.ghost:hover{color:var(--ink);border-color:var(--mute)}
+.go{background:var(--accent);color:var(--bg);border:0;padding:11px 22px}
+.go:hover{filter:brightness(1.08)}
+.go:disabled{opacity:.5;cursor:wait}
+.priv{color:var(--mute);font-size:12.5px;margin-top:12px}
+
+/* result */
+#out{margin-top:44px}
+.res{--c:var(--accent);border:1px solid var(--c);background:var(--panel)}
+.top{padding:22px 22px 18px;border-bottom:1px solid var(--line)}
+.state{font:700 12.5px var(--mono);color:var(--c);display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.state:before{content:"";width:9px;height:9px;background:var(--c)}
+.top h2{font:900 clamp(34px,8vw,56px)/1 var(--display);font-stretch:118%;letter-spacing:-.03em;color:var(--c);margin-bottom:10px}
+.top p{max-width:56ch}
+.meter{padding:18px 22px;border-bottom:1px solid var(--line)}
+.meter .lbl{display:flex;justify-content:space-between;font-size:13px;color:var(--mute);margin-bottom:10px}
+.meter .lbl b{color:var(--ink)}
+.segs{display:grid;grid-template-columns:repeat(20,1fr);gap:3px}
+.segs span{height:14px;background:var(--line)}
+.segs span.on{background:var(--c);animation:fill .25s both;animation-delay:calc(var(--i)*35ms)}
+@keyframes fill{from{opacity:0;transform:scaleY(.3)}to{opacity:1;transform:none}}
+.sec{padding:18px 22px;border-bottom:1px solid var(--line)}
+.sec:last-child{border-bottom:0}
+.sec h3{font:700 13px var(--mono);color:var(--mute);margin-bottom:10px}
+.sec ul{list-style:none;padding:0}
+.sec li{padding:7px 0 7px 18px;position:relative;font-size:14.5px}
+.sec li:before{content:"";position:absolute;left:0;top:15px;width:7px;height:7px;background:var(--c)}
+.sec.do li:before{background:var(--accent)}
+details summary{cursor:pointer;color:var(--mute);font-size:13px;font-weight:700;list-style:none}
+details summary:before{content:"+ "}
+details[open] summary:before{content:"- "}
+.log{margin-top:12px;font-size:13px}
+.log div{display:grid;grid-template-columns:44px 1fr;gap:10px;padding:5px 0;border-top:1px dashed var(--line)}
+.log b{color:var(--c)}
+.fine{padding:14px 22px;color:var(--mute);font-size:12.5px}
+.err{border:1px solid var(--red);color:var(--red);padding:14px 18px}
+
+/* how it works */
+.how{margin-top:72px;border-top:1px solid var(--line);padding-top:28px}
+.how h2{font:800 20px var(--display);font-stretch:112%;margin-bottom:18px}
+.how ol{list-style:none;padding:0;display:grid;gap:14px}
+.how li{display:grid;grid-template-columns:32px 1fr;gap:12px;font-size:14.5px}
+.how li b{color:var(--accent)}
+.how li span{color:var(--mute)}
+footer{margin-top:56px;color:var(--mute);font-size:12.5px}
+
+@media(prefers-reduced-motion:reduce){.segs span.on{animation:none}}
+@media(max-width:480px){.brand span{display:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="brand">
+    <div class="mark" aria-hidden="true"><svg viewBox="0 0 18 18"><rect x="2" y="1" width="5" height="16"/><rect x="11" y="1" width="5" height="16"/></svg></div>
+    <b>Pause</b>
+    <span>scam check for messages</span>
+  </header>
+
+  <h1>Check before you <i>tap.</i></h1>
+  <p class="lead">Got a strange SMS, email or chat message? Paste it here. You'll get a verdict, the warning signs we found, and what to do next.</p>
+
+  <div class="box">
+    <textarea id="t" maxlength="4000" aria-label="Message to check" placeholder="Paste the message here..."></textarea>
+    <div class="bar">
+      <span class="count" id="n">0 / 4000</span>
+      <button class="ghost" id="ex" type="button">Try an example</button>
+      <button class="go" id="go" type="button">Check message</button>
+    </div>
+  </div>
+  <p class="priv">Never paste real passwords, PINs or codes. Your message is not stored.</p>
+
+  <section id="out" aria-live="polite"></section>
+
+  <section class="how">
+    <h2>How it works</h2>
+    <ol>
+      <li><b>1</b><div>Paste the message<br><span>Text only for now. Remove any real codes first.</span></div></li>
+      <li><b>2</b><div>Rules check it<br><span>Look-alike links, fake urgency, and requests for money or codes each add to a risk score.</span></div></li>
+      <li><b>3</b><div>AI explains it<br><span>You get a plain-language verdict, built from what the rules found.</span></div></li>
+    </ol>
+  </section>
+
+  <footer>Pause gives guidance, not proof. When in doubt, contact your bank or provider through their official app or number.</footer>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const t = $("t"), out = $("out"), go = $("go");
+const STATES = {
+  likely_scam: ["Likely a scam", "var(--red)", "PAUSED: do not tap"],
+  suspicious:  ["Suspicious",    "var(--amber)", "PAUSED: be careful"],
+  looks_ok:    ["Looks okay",    "var(--green)", "NO STRONG SIGNS FOUND"],
+};
+const EXAMPLE = "URGENT: your telebirr account is blocked. Verify now at http://telebirr-verify.top/login or lose access within 24 hours.";
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const list = a => a && a.length ? "<ul>" + a.map(x => `<li>${esc(x)}</li>`).join("") + "</ul>" : "<p>Nothing specific found.</p>";
+
+t.oninput = () => $("n").textContent = t.value.length + " / 4000";
+$("ex").onclick = () => { t.value = EXAMPLE; t.oninput(); t.focus(); };
+
+function render(d) {
+  const [label, color, state] = STATES[d.verdict] || STATES.suspicious;
+  const on = Math.round(d.score / 5);
+  const segs = Array.from({length: 20}, (_, i) => `<span class="${i < on ? "on" : ""}" style="--i:${i}"></span>`).join("");
+  const log = (d.signals || []).map(s => `<div><b>+${s.weight}</b><span>${esc(s.label)}</span></div>`).join("");
+  out.innerHTML = `<div class="res" style="--c:${color}">
+    <div class="top"><div class="state">${state}</div><h2>${label}</h2><p>${esc(d.summary)}</p></div>
+    <div class="meter"><div class="lbl"><span>Risk score</span><b>${d.score} / 100</b></div>
+      <div class="segs" role="img" aria-label="Risk score ${d.score} out of 100">${segs}</div></div>
+    <div class="sec"><h3>What we found</h3>${list(d.red_flags)}</div>
+    <div class="sec do"><h3>What to do</h3>${list(d.next_steps)}</div>
+    ${log ? `<div class="sec"><details><summary>See how the score was calculated</summary><div class="log">${log}</div></details></div>` : ""}
+    <div class="fine">${d.ai_used ? "Explanation written by AI from the rule results." : "Rule-based result (AI explanation unavailable)."}</div>
+  </div>`;
+  out.scrollIntoView({behavior: matchMedia("(prefers-reduced-motion:reduce)").matches ? "auto" : "smooth", block: "start"});
+}
+
+go.onclick = async () => {
+  if (t.value.trim().length < 5) {
+    out.innerHTML = '<p class="err">Paste a message of at least 5 characters.</p>';
+    return;
+  }
+  go.disabled = true; go.textContent = "Checking..."; out.innerHTML = "";
+  try {
+    const r = await fetch("/api/check", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({text: t.value}),
+    });
+    if (!r.ok) throw new Error((await r.json()).detail || "Something went wrong. Try again.");
+    render(await r.json());
+  } catch (e) {
+    out.innerHTML = `<p class="err">${esc(e.message)}</p>`;
+  }
+  go.disabled = false; go.textContent = "Check message";
+};
+</script>
+</body>
+</html>
