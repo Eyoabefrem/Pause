@@ -4,7 +4,7 @@
 
 **Live demo:** https://pause-scamcheck.onrender.com
 *(Hosted on a free tier, so the first load after inactivity can take about a minute.)*
-<!-- Add a screenshot or demo GIF here: ![Pause screenshot](docs/screenshot.png) -->
+![Pause screenshot](docs/screenshot.png)
 
 ## How it works
 
