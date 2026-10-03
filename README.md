@@ -2,7 +2,9 @@
 
 **Check before you tap.** Paste a suspicious SMS, email or chat message and get a verdict, the warning signs, and what to do next. Built with mobile-money and banking scams in mind.
 
-<!-- Add a screenshot or demo GIF here: ![Pause demo](docs/demo.gif) -->
+**Live demo:** https://pause-scamcheck.onrender.com
+*(Hosted on a free tier, so the first load after inactivity can take about a minute.)*
+<!-- Add a screenshot or demo GIF here: ![Pause screenshot](docs/screenshot.png) -->
 
 ## How it works
 
